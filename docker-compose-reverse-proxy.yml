@@ -1,0 +1,30 @@
+version: "3.7"
+services:
+
+  nginx:
+    container_name: nginx
+    image: linuxserver/swag:latest
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/hass/reverse-proxy:/config
+    networks:
+      - backend
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - EMAIL=youremail@gmail.com
+      - URL=wizth.com
+      - SUBDOMAINS=www,ha
+     #- EXTRA_DOMAINS=
+      - VALIDATION=http
+      - TZ=Asia/Bangkok
+    ports:
+      - "80:80"
+      - "443:443"
+
+networks:
+  backend:
+    external:
+      name: backend
+

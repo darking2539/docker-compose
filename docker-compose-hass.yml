@@ -1,0 +1,86 @@
+version: "3.7"
+services:
+
+  pma:
+    container_name: pma
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8088:80"
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - backend
+    environment:
+      PMA_ABSOLUTE_URI: https://pma.[YOURURL].com
+      MYSQL_ROOT_PASSWORD: home2021
+      TZ: "Asia/Bangkok"
+      PMA_HOST: mariadb
+
+  ha:
+    container_name: ha
+    image: homeassistant/home-assistant:latest
+    volumes:
+      - ./config:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8123:8123
+    networks:
+      - backend
+    privileged: true
+    restart: always
+    environment:
+      TZ: "Asia/Bangkok"
+
+  mqtt-master:
+    container_name: mqtt
+    image: eclipse-mosquitto:latest
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 1883:1883
+      - 9001:9001
+    networks:
+      - backend
+    restart: always
+    environment:
+      TZ: "Asia/Bangkok"
+
+  mqtt-bridge:
+    container_name: mqtt-bridge
+    image: eclipse-mosquitto:latest
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 1884:1884
+      - 9002:9002
+    networks:
+      - backend
+    restart: always
+    environment:
+      TZ: "Asia/Bangkok"
+
+  nodered:
+    container_name: nodered
+    image: nodered/node-red-docker:v8
+    volumes:
+      - ./node-red:/data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    ports:
+      - 1880:1880
+    networks:
+      - backend
+    restart: always
+    environment:
+      TZ: "Asia/Bangkok"
+
+volumes:
+  mqtt_data:
+      driver: local
+
+networks:
+  backend:
+    external:
+      name: backend
+
